@@ -1,0 +1,19 @@
+parameters:
+  fos_rest.converter.request_body.class: Draw\DrawBundle\Request\RequestBodyParamConverter
+
+services:
+  nucleus_rest.request_deserializer:
+    alias: fos_rest.converter.request_body
+
+  nucleus_rest.exception_subscriber:
+    class: Draw\DrawBundle\EventListener\ApiExceptionSubscriber
+    arguments:
+        - %kernel.debug%
+        - %fos_rest.exception.codes%
+    tags:
+        - { name: kernel.event_subscriber }
+
+  jms_serializer.object_constructor:
+      alias: jms_serializer.doctrine_object_constructor
+      public: false
+
