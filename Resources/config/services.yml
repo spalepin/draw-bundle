@@ -1,5 +1,6 @@
 parameters:
   fos_rest.converter.request_body.class: Draw\DrawBundle\Request\RequestBodyParamConverter
+  fos_rest.view_response_listener.class: Draw\DrawBundle\EventListener\ViewResponseListener
 
 services:
   nucleus_rest.request_deserializer:
