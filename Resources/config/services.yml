@@ -1,20 +1,30 @@
 parameters:
-  fos_rest.converter.request_body.class: Draw\DrawBundle\Request\RequestBodyParamConverter
-  fos_rest.view_response_listener.class: Draw\DrawBundle\EventListener\ViewResponseListener
+    fos_rest.converter.request_body.class: Draw\DrawBundle\Request\RequestBodyParamConverter
+    fos_rest.view_response_listener.class: Draw\DrawBundle\EventListener\ViewResponseListener
 
 services:
-  nucleus_rest.request_deserializer:
-    alias: fos_rest.converter.request_body
+    draw.request_deserializer:
+        alias: fos_rest.converter.request_body
 
-  nucleus_rest.exception_subscriber:
-    class: Draw\DrawBundle\EventListener\ApiExceptionSubscriber
-    arguments:
-        - %kernel.debug%
-        - %fos_rest.exception.codes%
-    tags:
-        - { name: kernel.event_subscriber }
+    draw.exception_subscriber:
+        class: Draw\DrawBundle\EventListener\ApiExceptionSubscriber
+        arguments:
+            - %kernel.debug%
+            - %fos_rest.exception.codes%
+        tags:
+            - { name: kernel.event_subscriber }
 
-  jms_serializer.object_constructor:
-      alias: jms_serializer.doctrine_object_constructor
-      public: false
+    jms_serializer.object_constructor:
+        alias: jms_serializer.doctrine_object_constructor
+        public: false
 
+    draw.doctrine.validation_entity_subscriber:
+        class: Draw\DrawBundle\EventListener\ValidationEntitySubscriber
+        arguments: [@validator]
+        tags:
+            - { name: doctrine.event_subscriber }
+
+    draw.security.voter.own_voter:
+        class: Draw\DrawBundle\Security\Voter\OwnVoter
+        tags:
+            - { name: security.voter }

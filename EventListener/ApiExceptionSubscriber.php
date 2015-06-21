@@ -2,6 +2,8 @@
 
 namespace Draw\DrawBundle\EventListener;
 
+use LookLike\Bundle\LookLikeBundle\Exception\ConstraintViolationListException;
+use Draw\DrawBundle\Validator\ViolationListToArrayConverter;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -79,6 +81,10 @@ class ApiExceptionSubscriber implements EventSubscriberInterface
             "code" => $statusCode,
             "message" => $exception->getMessage(),
         );
+
+        if($exception instanceof ConstraintViolationListException) {
+            $data['errors'] = ViolationListToArrayConverter::convert($exception->getViolationList());
+        }
 
         if($this->debug) {
             $data['detail'] = $this->getExceptionDetail($exception);
