@@ -3,6 +3,8 @@
 namespace Draw\DrawBundle\Request;
 
 use Draw\DrawBundle\PropertyAccess\DynamicArrayObject;
+use Draw\DrawBundle\Serializer\GroupHierarchy;
+use JMS\Serializer\DeserializationContext;
 use LookLike\Bundle\LookLikeBundle\Exception\ConstraintViolationListException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\Request;
@@ -10,6 +12,16 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class RequestBodyParamConverter extends \FOS\RestBundle\Request\RequestBodyParamConverter
 {
+    /**
+     * @var GroupHierarchy
+     */
+    private $groupHierarchy;
+
+    public function setGroupHierarchy(GroupHierarchy $groupHierarchy)
+    {
+        $this->groupHierarchy = $groupHierarchy;
+    }
+
     public function apply(Request $request, ParamConverter $configuration)
     {
         $options = (array) $configuration->getOptions();
@@ -39,5 +51,16 @@ class RequestBodyParamConverter extends \FOS\RestBundle\Request\RequestBodyParam
         }
 
         return $result;
+    }
+
+    public function configureDeserializationContext(DeserializationContext $context, array $options)
+    {
+        if(!isset($options['groups'])) {
+            $options['groups'] = ['Default'];
+        }
+
+        $options['groups'] = $this->groupHierarchy->getReachableGroups($options['groups']);
+
+        return parent::configureDeserializationContext($context, $options);
     }
 }

@@ -1,6 +1,7 @@
 parameters:
     fos_rest.converter.request_body.class: Draw\DrawBundle\Request\RequestBodyParamConverter
     fos_rest.view_response_listener.class: Draw\DrawBundle\EventListener\ViewResponseListener
+    draw.serializer.group_hierarchy: {}
 
 services:
     draw.request_deserializer:
@@ -28,3 +29,7 @@ services:
         class: Draw\DrawBundle\Security\Voter\OwnVoter
         tags:
             - { name: security.voter }
+
+    draw.serializer.group_hierarchy:
+        class: Draw\DrawBundle\Serializer\GroupHierarchy
+        arguments: [%draw.serializer.group_hierarchy%]

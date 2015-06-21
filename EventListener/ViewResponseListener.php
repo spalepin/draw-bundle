@@ -25,6 +25,11 @@ class ViewResponseListener extends \FOS\RestBundle\EventListener\ViewResponseLis
             }
         }
 
+        $groups = $this->container->get("draw.serializer.group_hierarchy")
+            ->getReachableGroups($configuration->getSerializerGroups());
+
+        $configuration->setSerializerGroups($groups);
+
         parent::onKernelView($event);
     }
 }

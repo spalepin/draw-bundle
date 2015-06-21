@@ -69,6 +69,15 @@ class RequestHelper
         return $this->setUri($uri);
     }
 
+    /**
+     * @param $propertyPath
+     * @return PropertyHelper
+     */
+    public function propertyHelper($propertyPath)
+    {
+        return new PropertyHelper($this, $propertyPath);
+    }
+
     public function expectContentType($contentType)
     {
         $this->assertions["responseContentType"] = function () use ($contentType) {
@@ -176,7 +185,7 @@ class RequestHelper
             }
 
             if (!file_exists($file)) {
-                file_put_contents($file, $content);
+                file_put_contents($file, json_encode(json_decode($content), JSON_PRETTY_PRINT));
             }
 
             $this->testCase->assertJsonStringEqualsJsonString(
