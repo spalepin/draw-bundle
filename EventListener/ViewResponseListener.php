@@ -19,16 +19,16 @@ class ViewResponseListener extends \FOS\RestBundle\EventListener\ViewResponseLis
         /** @var \FOS\RestBundle\Controller\Annotations\View $configuration */
         $configuration = $request->attributes->get('_view');
 
-        if($configuration) {
-            if(!$configuration->getSerializerGroups()) {
+        if ($configuration) {
+            if (!$configuration->getSerializerGroups()) {
                 $configuration->setSerializerGroups(array(GroupsExclusionStrategy::DEFAULT_GROUP));
             }
+
+            $groups = $this->container->get("draw.serializer.group_hierarchy")
+                ->getReachableGroups($configuration->getSerializerGroups());
+
+            $configuration->setSerializerGroups($groups);
         }
-
-        $groups = $this->container->get("draw.serializer.group_hierarchy")
-            ->getReachableGroups($configuration->getSerializerGroups());
-
-        $configuration->setSerializerGroups($groups);
 
         parent::onKernelView($event);
     }
