@@ -41,18 +41,18 @@ class GroupHierarchy
     private function buildGroupMap()
     {
         $this->map = array();
-        foreach ($this->hierarchy as $main => $roles) {
-            $this->map[$main] = $roles;
+        foreach ($this->hierarchy as $main => $groups) {
+            $this->map[$main] = $groups;
             $visited = array();
-            $additionalRoles = $roles;
-            while ($role = array_shift($additionalRoles)) {
-                if (!isset($this->hierarchy[$role])) {
+            $additionalGroups = $groups;
+            while ($group = array_shift($additionalGroups)) {
+                if (!isset($this->hierarchy[$group])) {
                     continue;
                 }
 
-                $visited[] = $role;
-                $this->map[$main] = array_unique(array_merge($this->map[$main], $this->hierarchy[$role]));
-                $additionalRoles = array_merge($additionalRoles, array_diff($this->hierarchy[$role], $visited));
+                $visited[] = $group;
+                $this->map[$main] = array_unique(array_merge($this->map[$main], $this->hierarchy[$group]));
+                $additionalGroups = array_merge($additionalGroups, array_diff($this->hierarchy[$group], $visited));
             }
         }
     }
