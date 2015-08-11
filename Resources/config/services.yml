@@ -2,6 +2,7 @@ parameters:
     fos_rest.converter.request_body.class: Draw\DrawBundle\Request\RequestBodyParamConverter
     fos_rest.view_response_listener.class: Draw\DrawBundle\EventListener\ViewResponseListener
     draw.serializer.group_hierarchy: {}
+    draw.serializer.groups_always_present: [all]
 
 services:
     draw.request_deserializer:
@@ -32,4 +33,4 @@ services:
 
     draw.serializer.group_hierarchy:
         class: Draw\DrawBundle\Serializer\GroupHierarchy
-        arguments: [%draw.serializer.group_hierarchy%]
+        arguments: [%draw.serializer.group_hierarchy%, %draw.serializer.groups_always_present%]

@@ -18,11 +18,11 @@ class CompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $container->getDefinition("fos_rest.converter.request_body")
-            ->addMethodCall(
+        $requestBodyConverter = $container->getDefinition("fos_rest.converter.request_body");
+
+        $requestBodyConverter->addMethodCall(
                 "setGroupHierarchy",
                 [new Reference("draw.serializer.group_hierarchy")]
             );
-
     }
 }

@@ -5,6 +5,7 @@ namespace Draw\DrawBundle\Serializer;
 class GroupHierarchy
 {
     private $hierarchy;
+    private $groupAlwaysPresent;
     private $map;
 
     /**
@@ -12,9 +13,10 @@ class GroupHierarchy
      *
      * @param array $hierarchy An array defining the hierarchy
      */
-    public function __construct(array $hierarchy)
+    public function __construct(array $hierarchy, array $groupsAlwaysPresent)
     {
         $this->hierarchy = $hierarchy;
+        $this->groupAlwaysPresent = $groupsAlwaysPresent;
 
         $this->buildGroupMap();
     }
@@ -35,7 +37,9 @@ class GroupHierarchy
             $reachableGroups = array_merge($reachableGroups, $this->map[$group]);
         }
 
-        return $reachableGroups;
+        return array_unique(
+            array_merge($reachableGroups, $this->groupAlwaysPresent)
+        );
     }
 
     private function buildGroupMap()
