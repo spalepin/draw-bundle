@@ -1,11 +1,11 @@
 <?php
 
-namespace Draw\DrawBundle\EventListener;
+namespace Draw\DrawBundle\Validator;
 
 use Doctrine\Common\EventSubscriber;
 use Doctrine\Common\Persistence\Event\LifecycleEventArgs;
 use Doctrine\ORM\Events;
-use LookLike\Bundle\LookLikeBundle\Exception\ConstraintViolationListException;
+use Draw\DrawBundle\Validator\Exception\ConstraintViolationListException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ValidationEntitySubscriber implements EventSubscriber

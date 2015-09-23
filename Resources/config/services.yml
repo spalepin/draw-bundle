@@ -21,7 +21,7 @@ services:
         public: false
 
     draw.doctrine.validation_entity_subscriber:
-        class: Draw\DrawBundle\EventListener\ValidationEntitySubscriber
+        class: Draw\DrawBundle\Validator\ValidationEntitySubscriber
         arguments: [@validator]
         tags:
             - { name: doctrine.event_subscriber }

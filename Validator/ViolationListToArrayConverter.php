@@ -2,8 +2,6 @@
 
 namespace Draw\DrawBundle\Validator;
 
-use Draw\DrawBundle\PropertyAccess\DynamicArrayObject;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 class ViolationListToArrayConverter
@@ -14,19 +12,17 @@ class ViolationListToArrayConverter
             return array();
         }
 
-        $propertyAccessor = PropertyAccess::createPropertyAccessor();
-
         $errors = array();
+
         foreach ($constraintViolationList as $constraintViolation) {
             /* @var $constraintViolation \Symfony\Component\Validator\ConstraintViolationInterface */
-            $errors[$constraintViolation->getPropertyPath()][] = $constraintViolation->getMessage();
+            $errors[$constraintViolation->getPropertyPath()] = array(
+                'propertyPath' => $constraintViolation->getPropertyPath(),
+                'message' => $constraintViolation->getMessage(),
+                'invalidValue' => $constraintViolation->getInvalidValue()
+            );
         }
 
-        $violationMap = new DynamicArrayObject(array());
-        foreach ($errors as $path => $messages) {
-            $propertyAccessor->setValue($violationMap, $path, $messages);
-        }
-
-        return $violationMap->getArrayCopy();
+        return $errors;
     }
 }
