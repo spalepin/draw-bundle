@@ -36,4 +36,14 @@ trait DoctrineControllerTrait
         $manager->flush($entity);
         return $entity;
     }
+
+    /**
+     * @param $class
+     * @param $alias
+     * @return \Doctrine\ORM\QueryBuilder
+     */
+    public function createOrmQueryBuilder($class, $alias)
+    {
+        return $this->getDoctrine()->getRepository($class)->createQueryBuilder($alias);
+    }
 }
