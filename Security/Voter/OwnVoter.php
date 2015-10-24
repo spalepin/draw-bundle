@@ -28,6 +28,10 @@ class OwnVoter implements VoterInterface
      */
     public function vote(TokenInterface $token, $object, array $attributes)
     {
+        if(!is_object($object)) {
+            return VoterInterface::ACCESS_ABSTAIN;
+        }
+
         if (!$this->supportsClass(get_class($object))) {
             return VoterInterface::ACCESS_ABSTAIN;
         }
