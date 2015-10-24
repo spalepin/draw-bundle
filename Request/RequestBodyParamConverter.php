@@ -5,7 +5,7 @@ namespace Draw\DrawBundle\Request;
 use Draw\DrawBundle\PropertyAccess\DynamicArrayObject;
 use Draw\DrawBundle\Serializer\GroupHierarchy;
 use JMS\Serializer\DeserializationContext;
-use LookLike\Bundle\LookLikeBundle\Exception\ConstraintViolationListException;
+use Draw\DrawBundle\Validator\Exception\ConstraintViolationListException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -24,14 +24,14 @@ class RequestBodyParamConverter extends \FOS\RestBundle\Request\RequestBodyParam
 
     public function apply(Request $request, ParamConverter $configuration)
     {
-        $options = (array) $configuration->getOptions();
+        $options = (array)$configuration->getOptions();
 
-        if(isset($options['propertiesMap'])) {
-            $content = new DynamicArrayObject(json_decode($request->getContent(),true));
+        if (isset($options['propertiesMap'])) {
+            $content = new DynamicArrayObject(json_decode($request->getContent(), true));
 
             $propertyAccessor = PropertyAccess::createPropertyAccessor();
 
-            foreach($options['propertiesMap'] as $target => $source) {
+            foreach ($options['propertiesMap'] as $target => $source) {
                 $propertyAccessor->setValue($content, $target, $request->attributes->get($source));
             }
 
@@ -42,20 +42,25 @@ class RequestBodyParamConverter extends \FOS\RestBundle\Request\RequestBodyParam
 
         $result = $this->execute($request, $configuration);
 
-        if($this->validationErrorsArgument && $request->attributes->has($this->validationErrorsArgument)) {
-            if(count($errors = $request->attributes->get($this->validationErrorsArgument))) {
-                $exception = new ConstraintViolationListException();
-                $exception->setViolationList($errors);
-                throw $exception;
+        if ($this->validationErrorsArgument && $request->attributes->has($this->validationErrorsArgument)) {
+            if (count($errors = $request->attributes->get($this->validationErrorsArgument))) {
+                $this->convertValidationErrorsToException($errors);
             }
         }
 
         return $result;
     }
 
+    protected function convertValidationErrorsToException($errors)
+    {
+        $exception = new ConstraintViolationListException();
+        $exception->setViolationList($errors);
+        throw $exception;
+    }
+
     public function configureDeserializationContext(DeserializationContext $context, array $options)
     {
-        if(!isset($options['groups'])) {
+        if (!isset($options['groups'])) {
             $options['groups'] = ['Default'];
         }
 
