@@ -32,6 +32,10 @@ class RequestHelper
         $this->client = $client;
         $this->testCase = $testCase;
         $this->expectingStatusCode(200);
+
+        $this->assertions['against'] = function () {
+            $this->filterContent($this->client->getResponse()->getContent());
+        };
     }
 
     /**
@@ -178,11 +182,7 @@ class RequestHelper
         }
 
         $this->assertions['against'] = function () use ($file) {
-            $content = $response = $this->client->getResponse()->getContent();
-
-            foreach ($this->contentFilters as $filter) {
-                $content = call_user_func($filter, $content);
-            }
+           $content = $this->filterContent($this->client->getResponse()->getContent());
 
             if (!file_exists($file)) {
                 file_put_contents($file, json_encode(json_decode($content), JSON_PRETTY_PRINT));
@@ -197,10 +197,19 @@ class RequestHelper
         return $this;
     }
 
+    private function filterContent($content)
+    {
+        foreach ($this->contentFilters as $filter) {
+            $content = call_user_func($filter, $content);
+        }
+
+        return $content;
+    }
+
     public function validateAgainstString($string)
     {
         $this->assertions['against'] = function () use ($string) {
-            $content = $response = $this->client->getResponse()->getContent();
+            $content = $this->filterContent($this->client->getResponse()->getContent());
 
             $this->testCase->assertJsonStringEqualsJsonString(
                 $string,
