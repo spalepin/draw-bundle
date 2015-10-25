@@ -18,6 +18,12 @@ class PropertyHelper
 
     public $replaceWithValue;
 
+    public $in = [];
+
+    public $parentPropertyHelper;
+
+    public $notSameAs = [];
+
     /**
      * @var RequestHelper
      */
@@ -45,12 +51,40 @@ class PropertyHelper
         return $this;
     }
 
+    public function notSameAs($value)
+    {
+        $this->notSameAs[] = $value;
+
+        return $this;
+    }
+
     public function replace($with = 'checked by Draw\DrawBundle\Test\PropertyHelper')
     {
         $this->mustReplaceValue = true;
         $this->replaceWithValue = $with;
 
         return $this;
+    }
+
+    /**
+     * @param $filterCallBack
+     * @return PropertyHelper
+     */
+    public function in($filterCallBack, $match = 1)
+    {
+        $this->in[] = [$filterCallBack, $match, $propertyHelper = new PropertyHelper($this->requestHelper, '')];
+        $this->type = 'array';
+        $propertyHelper->parentPropertyHelper = $this;
+
+        return $propertyHelper;
+    }
+
+    /**
+     * @return PropertyHelper
+     */
+    public function end()
+    {
+        return $this->parentPropertyHelper;
     }
 
     public function attach()
@@ -73,12 +107,33 @@ class PropertyHelper
         );
 
         $value = $this->propertyAccessor->getValue($decodedData, $this->propertyPath);
+
         if ($this->type) {
             $testCase->assertInternalType($this->type, $value, 'Property path: ' . $this->propertyPath);
         }
 
+        foreach ($this->in as $in) {
+            list($filterCallback, $match, $propertyHelper) = $in;
+            $currentMatch = 0;
+            /* @var PropertyHelper $propertyHelper */
+            foreach ($value as $key => $subValue) {
+                if (!call_user_func($filterCallback, $subValue)) {
+                    continue;
+                }
+                $currentMatch++;
+                $propertyHelper->propertyPath = $this->propertyPath . '[' . $key . ']';
+                $decodedData = json_decode($propertyHelper->assert(json_encode($decodedData)));
+            }
+
+            $testCase->assertSame($match, $currentMatch, 'The amount of item found does not match in [' . $this->propertyPath . ']');
+        }
+
         if ($this->checkIsSameValue) {
-            $testCase->assertSame($this->value, $value);
+            $testCase->assertJsonStringEqualsJsonString(json_encode($this->value), json_encode($value));
+        }
+
+        foreach($this->notSameAs as $notSameValue) {
+            $testCase->assertNotSame($notSameValue, $value, 'Property path: ' . $this->propertyPath);
         }
 
         if ($this->mustReplaceValue) {

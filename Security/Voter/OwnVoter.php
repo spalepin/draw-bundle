@@ -38,7 +38,7 @@ class OwnVoter implements VoterInterface
 
         $user = $token->getUser();
         if (!$user instanceof OwnerInterface) {
-            return VoterInterface::ACCESS_DENIED;
+            return VoterInterface::ACCESS_ABSTAIN;
         }
 
         foreach ($attributes as $attribute) {

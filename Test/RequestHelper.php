@@ -27,6 +27,8 @@ class RequestHelper
 
     public $contentFilters = [];
 
+    public $servers = [];
+
     public function __construct(PHPUnit_Framework_TestCase $testCase, Client $client)
     {
         $this->client = $client;
@@ -229,8 +231,7 @@ class RequestHelper
 
     public function execute()
     {
-        $server = array();
-
+        $server = $this->servers;
         $body = null;
         if ($this->isJson) {
             $server['HTTP_ACCEPT'] = 'application/json';
@@ -246,6 +247,13 @@ class RequestHelper
         }
 
         return $crawler;
+    }
+
+    public function setServerParameter($name, $value)
+    {
+        $this->servers[$name] = $value;
+
+        return $this;
     }
 
     public function executeAndDecodeJson()
