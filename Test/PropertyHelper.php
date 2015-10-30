@@ -129,7 +129,7 @@ class PropertyHelper
         }
 
         if ($this->checkIsSameValue) {
-            $testCase->assertJsonStringEqualsJsonString(json_encode($this->value), json_encode($value));
+            $testCase->assertJsonStringEqualsJsonString(json_encode($this->value), json_encode($value), 'Property path: ' . $this->propertyPath);
         }
 
         foreach($this->notSameAs as $notSameValue) {
