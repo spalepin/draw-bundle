@@ -3,9 +3,9 @@
 namespace Draw\DrawBundle\Request;
 
 use Draw\DrawBundle\PropertyAccess\DynamicArrayObject;
+use Draw\DrawBundle\Request\Exception\RequestValidationException;
 use Draw\DrawBundle\Serializer\GroupHierarchy;
 use JMS\Serializer\DeserializationContext;
-use Draw\DrawBundle\Validator\Exception\ConstraintViolationListException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -53,7 +53,7 @@ class RequestBodyParamConverter extends \FOS\RestBundle\Request\RequestBodyParam
 
     protected function convertValidationErrorsToException($errors)
     {
-        $exception = new ConstraintViolationListException();
+        $exception = new RequestValidationException();
         $exception->setViolationList($errors);
         throw $exception;
     }

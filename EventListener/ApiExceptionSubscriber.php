@@ -2,8 +2,7 @@
 
 namespace Draw\DrawBundle\EventListener;
 
-use LookLike\Bundle\LookLikeBundle\Exception\ConstraintViolationListException;
-use Draw\DrawBundle\Validator\ViolationListToArrayConverter;
+use Draw\DrawBundle\Request\Exception\RequestValidationException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,6 +23,7 @@ class ApiExceptionSubscriber implements EventSubscriberInterface
     ) {
         $this->debug = $debug;
         $this->exceptionCodes = $exceptionCodes;
+        $this->exceptionCodes[RequestValidationException::class] = 400;
     }
 
     /**
@@ -82,8 +82,18 @@ class ApiExceptionSubscriber implements EventSubscriberInterface
             "message" => $exception->getMessage(),
         );
 
-        if($exception instanceof ConstraintViolationListException) {
-            $data['errors'] = ViolationListToArrayConverter::convert($exception->getViolationList());
+        if($exception instanceof RequestValidationException) {
+            $errors = array();
+            foreach ($exception->getViolationList() as $constraintViolation) {
+                /* @var $constraintViolation \Symfony\Component\Validator\ConstraintViolationInterface */
+                $errors[] = array(
+                    'propertyPath' => $constraintViolation->getPropertyPath(),
+                    'message' => $constraintViolation->getMessage(),
+                    'invalidValue' => $constraintViolation->getInvalidValue()
+                );
+            }
+
+            $data['errors'] = $errors;
         }
 
         if($this->debug) {
