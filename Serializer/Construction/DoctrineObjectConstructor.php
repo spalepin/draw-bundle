@@ -63,6 +63,10 @@ class DoctrineObjectConstructor implements ObjectConstructorInterface
             return null;
         }
 
+        if(!is_array($data)) {
+            return null;
+        }
+
         $classMetadata = $objectManager->getClassMetadata($class);
         $identifierList = array();
 
