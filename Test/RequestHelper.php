@@ -9,6 +9,9 @@ class RequestHelper
 {
     public $testCase;
 
+    /**
+     * @var Client
+     */
     public $client;
 
     public $uri;
@@ -19,10 +22,17 @@ class RequestHelper
 
     public $body;
 
+    public $maximumSqlQuery;
+
     public $assertions = [
         "statusCode" => null,
         "responseContentType" => null,
         "against" => null,
+    ];
+
+    public $hooks = [
+        'preRequest' => [],
+        'preAssertion' => []
     ];
 
     public $contentFilters = [];
@@ -48,6 +58,20 @@ class RequestHelper
     public static function factory(PHPUnit_Framework_TestCase $testCase, Client $client)
     {
         return new static($testCase, $client);
+    }
+
+    public function addPreAssertionCallback($callback)
+    {
+        $this->hooks['preAssertion'][] = $callback;
+
+        return $this;
+    }
+
+    public function addPreRequestCallback($callback)
+    {
+        $this->hooks['preRequest'][] = $callback;
+
+        return $this;
     }
 
     public function get($uri = null)
@@ -241,7 +265,16 @@ class RequestHelper
             }
         }
 
+        foreach($this->hooks['preRequest'] as $callback) {
+            call_user_func($callback, $this);
+        }
+
         $crawler = $this->client->request($this->method, $this->uri, array(), array(), $server, $body);
+
+        foreach($this->hooks['preAssertion'] as $callback) {
+            call_user_func($callback, $this, $crawler);
+        }
+
         foreach (array_filter($this->assertions) as $callback) {
             call_user_func($callback, $crawler);
         }
@@ -263,6 +296,31 @@ class RequestHelper
         return json_decode($this->client->getResponse()->getContent(), true);
     }
 
+    /**
+     * @param $amount
+     */
+    public function maximumSqlQuery($amount)
+    {
+        if(!$this->maximumSqlQuery) {
+            $this->addPreRequestCallback(function() {
+                $this->client->getKernel()->boot();
+                $this->client->enableProfiler();
+            });
+        }
+
+        $this->maximumSqlQuery = $amount;
+        $this->asserting(function() {
+            $queries = $this->client->getProfile()->getCollector('db')->getQueries()['default'];
+            //We remove the query "COMMIT" and "START TRANSACTION"
+            $queries = array_filter($queries, function($query) {
+               return !is_null($query['types']);
+            });
+
+            $this->testCase->assertLessThanOrEqual($this->maximumSqlQuery, count($queries), json_encode($queries, JSON_PRETTY_PRINT));
+        });
+
+        return $this;
+    }
 
     private function getCallingClassAndMethod()
     {

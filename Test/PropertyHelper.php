@@ -24,6 +24,8 @@ class PropertyHelper
 
     public $notSameAs = [];
 
+    public $doesNotExists;
+
     /**
      * @var RequestHelper
      */
@@ -47,6 +49,13 @@ class PropertyHelper
     {
         $this->checkIsSameValue = true;
         $this->value = $value;
+
+        return $this;
+    }
+
+    public function doesNotExists()
+    {
+        $this->doesNotExists = true;
 
         return $this;
     }
@@ -99,6 +108,16 @@ class PropertyHelper
         $decodedData = json_decode($data);
 
         $testCase = $this->requestHelper->testCase;
+
+        if($this->doesNotExists) {
+            $testCase->assertFalse(
+                $this->propertyAccessor->isReadable($decodedData, $this->propertyPath),
+                "Property does exists.\nProperty path: " . $this->propertyPath . "\nData:" .
+                json_encode($decodedData, JSON_PRETTY_PRINT)
+            );
+
+            return json_encode($decodedData);
+        }
 
         $testCase->assertTrue(
             $this->propertyAccessor->isReadable($decodedData, $this->propertyPath),
