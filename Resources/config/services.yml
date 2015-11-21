@@ -14,7 +14,7 @@ services:
 
     draw.doctrine.validation_entity_subscriber:
         class: Draw\DrawBundle\Validator\ValidationEntitySubscriber
-        arguments: [@validator]
+        arguments: [@service_container]
         tags:
             - { name: doctrine.event_subscriber }
 

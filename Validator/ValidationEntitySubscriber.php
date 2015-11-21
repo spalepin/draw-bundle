@@ -6,18 +6,18 @@ use Doctrine\Common\EventSubscriber;
 use Doctrine\Common\Persistence\Event\LifecycleEventArgs;
 use Doctrine\ORM\Events;
 use Draw\DrawBundle\Validator\Exception\ConstraintViolationListException;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ValidationEntitySubscriber implements EventSubscriber
 {
     /**
-     * @var ValidatorInterface
+     * @var ContainerInterface
      */
-    private $validator;
+    private $container;
 
-    public function __construct(ValidatorInterface $validator)
+    public function __construct(ContainerInterface $container)
     {
-        $this->validator = $validator;
+        $this->container = $container;
     }
 
     /**
@@ -38,7 +38,7 @@ class ValidationEntitySubscriber implements EventSubscriber
     {
         $entity = $args->getObject();
 
-        $violations = $this->validator->validate($entity, array('persist'));
+        $violations = $this->container->get('validator')->validate($entity, array('persist'));
 
         if ($violations->count() > 0) {
             $exception = new ConstraintViolationListException("" . $violations);
