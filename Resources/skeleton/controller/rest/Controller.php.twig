@@ -26,7 +26,7 @@ class {{ controller }}Controller extends Controller
      *
      * @Rest\Post("/{{ entityDash }}s", name="{{ entityUnderScore }}_create")
      *
-     * @Rest\View(statusCode=201, serializerGroups={"{{ entityDash }}:read})
+     * @Rest\View(statusCode=201, serializerGroups={"{{ entityDash }}:read"})
      *
      * @ParamConverter(
      *     name="entity",
@@ -54,7 +54,7 @@ class {{ controller }}Controller extends Controller
      *
      * @Rest\Get("/{{ entityDash }}s/{id}", name="{{ entityUnderScore }}_get")
      *
-     * @Rest\View(serializerGroups={"{{ entityDash }}:read})
+     * @Rest\View(serializerGroups={"{{ entityDash }}:read"})
      *
      * @ParamConverter(name="entity")
      *
@@ -76,7 +76,7 @@ class {{ controller }}Controller extends Controller
      *
      * @Rest\Get("/{{ entityDash }}s/{id}", name="{{ entityUnderScore }}_update")
      *
-     * @Rest\View(serializerGroups={"{{ entityDash }}:read})
+     * @Rest\View(serializerGroups={"{{ entityDash }}:read"})
      *
      * @ParamConverter(
      *     name="entity",
@@ -88,7 +88,7 @@ class {{ controller }}Controller extends Controller
      *     }
      * )
      *
-     * @Security("is_granted('OWN', entity))
+     * @Security("is_granted('OWN', entity)")
      *
      * @param Entity $entity
      *
@@ -106,7 +106,7 @@ class {{ controller }}Controller extends Controller
      *
      * @Rest\Get("/{{ entityDash }}s", name="{{ entityUnderScore }}_list")
      *
-     * @Rest\View(serializerGroups={"{{ entityDash }}:read})
+     * @Rest\View(serializerGroups={"{{ entityDash }}:read"})
      *
      * @Security("has_role('ROLE_USER')")
      *
@@ -133,7 +133,7 @@ class {{ controller }}Controller extends Controller
      *
      * @ParamConverter(name="entity")
      *
-     * @Security("is_granted('OWN', entity))
+     * @Security("is_granted('OWN', entity)")
      *
      * @param Entity $entity
      */
