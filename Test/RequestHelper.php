@@ -108,6 +108,16 @@ class RequestHelper
         return new PropertyHelper($this, $propertyPath);
     }
 
+    /**
+     * @param string $message
+     *
+     * @return LogHelper
+     */
+    public function logHelper($message)
+    {
+        return new LogHelper($this, $message);
+    }
+
     public function expectContentType($contentType)
     {
         $this->assertions["responseContentType"] = function () use ($contentType) {
@@ -256,12 +266,12 @@ class RequestHelper
     public function execute()
     {
         $server = $this->servers;
-        $body = null;
+        $body = $this->body;
         if ($this->isJson) {
             $server['HTTP_ACCEPT'] = 'application/json';
             $server['CONTENT_TYPE'] = 'application/json';
-            if ($this->body) {
-                $body = json_encode($this->body);
+            if (!is_null($this->body)) {
+                $body = json_encode($body);
             }
         }
 

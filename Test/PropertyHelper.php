@@ -103,29 +103,27 @@ class PropertyHelper
         return $this->requestHelper;
     }
 
-    public function assert($data)
+    protected function assertData($data)
     {
-        $decodedData = json_decode($data);
-
         $testCase = $this->requestHelper->testCase;
 
         if($this->doesNotExists) {
             $testCase->assertFalse(
-                $this->propertyAccessor->isReadable($decodedData, $this->propertyPath),
+                $this->propertyAccessor->isReadable($data, $this->propertyPath),
                 "Property does exists.\nProperty path: " . $this->propertyPath . "\nData:" .
-                json_encode($decodedData, JSON_PRETTY_PRINT)
+                json_encode($data, JSON_PRETTY_PRINT)
             );
 
-            return json_encode($decodedData);
+            return $data;
         }
 
         $testCase->assertTrue(
-            $this->propertyAccessor->isReadable($decodedData, $this->propertyPath),
+            $this->propertyAccessor->isReadable($data, $this->propertyPath),
             "Property does not exists.\nProperty path: " . $this->propertyPath . "\nData:" .
-            json_encode($decodedData, JSON_PRETTY_PRINT)
+            json_encode($data, JSON_PRETTY_PRINT)
         );
 
-        $value = $this->propertyAccessor->getValue($decodedData, $this->propertyPath);
+        $value = $this->propertyAccessor->getValue($data, $this->propertyPath);
 
         if ($this->type) {
             $testCase->assertInternalType($this->type, $value, 'Property path: ' . $this->propertyPath);
@@ -141,7 +139,7 @@ class PropertyHelper
                 }
                 $currentMatch++;
                 $propertyHelper->propertyPath = $this->propertyPath . '[' . $key . ']';
-                $decodedData = json_decode($propertyHelper->assert(json_encode($decodedData)));
+                $decodedData = json_decode($propertyHelper->assert(json_encode($data)));
             }
 
             $testCase->assertSame($match, $currentMatch, 'The amount of item found does not match in [' . $this->propertyPath . ']');
@@ -158,6 +156,15 @@ class PropertyHelper
         if ($this->mustReplaceValue) {
             $this->propertyAccessor->setValue($decodedData, $this->propertyPath, $this->replaceWithValue);
         }
+
+        return $data;
+    }
+
+    public function assert($data)
+    {
+        $decodedData = json_decode($data);
+
+        $decodedData = $this->assertData($decodedData);
 
         return json_encode($decodedData);
     }
