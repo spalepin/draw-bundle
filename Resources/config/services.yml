@@ -3,6 +3,7 @@ parameters:
     fos_rest.view_response_listener.class: Draw\DrawBundle\EventListener\ViewResponseListener
     draw.serializer.group_hierarchy: {}
     draw.serializer.groups_always_present: [all]
+    draw.serializer.self_link.entities_routes: {}
 
 services:
     draw.request_deserializer:
@@ -26,3 +27,9 @@ services:
     draw.serializer.group_hierarchy:
         class: Draw\DrawBundle\Serializer\GroupHierarchy
         arguments: [%draw.serializer.group_hierarchy%, %draw.serializer.groups_always_present%]
+
+    draw.serializer.self_link:
+        class: Draw\DrawBundle\Serializer\SelfLinkEventListener
+        arguments: [@service_container, %draw.serializer.self_link.entities_routes%]
+        tags:
+            - { name: jms_serializer.event_listener, format: json, direction: serialization, event: serializer.post_serialize, method: onPostSerialize  }
