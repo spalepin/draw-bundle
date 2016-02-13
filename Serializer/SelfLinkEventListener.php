@@ -5,6 +5,7 @@ namespace Draw\DrawBundle\Serializer;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Doctrine\Common\Util\ClassUtils;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class SelfLinkEventListener
 {
@@ -35,7 +36,8 @@ class SelfLinkEventListener
                             '_href',
                             $this->container->get("router")->generate(
                                 $routeName,
-                                array('id' => $this->container->get("property_accessor")->getValue($object, 'id'))
+                                array('id' => $this->container->get("property_accessor")->getValue($object, 'id')),
+                                UrlGeneratorInterface::ABSOLUTE_URL
                             )
                         );
                         break;
