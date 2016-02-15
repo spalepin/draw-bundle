@@ -28,6 +28,7 @@ class SelfLinkEventListener
         $object = $objectEvent->getObject();
         try {
             $class = ClassUtils::getClass($objectEvent->getObject());
+            $visitor->addData('_class', $class);
             foreach ($this->entitiesRoutes as $entityClass => $routeName) {
                 switch (true) {
                     case $class == $entityClass:
