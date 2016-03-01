@@ -16,10 +16,25 @@ class SelfLinkEventListener
      */
     private $container;
 
+    /**
+     * @var bool
+     */
+    private $addClass = true;
+
     public function __construct(ContainerInterface $container, $entitiesRoutes = array())
     {
         $this->container = $container;
         $this->entitiesRoutes = $entitiesRoutes;
+    }
+
+    /**
+     * If we must add the class attribute on serialization
+     *
+     * @param $addClass
+     */
+    public function setAddClass($addClass)
+    {
+        $this->addClass = $addClass;
     }
 
     public function onPostSerialize(ObjectEvent $objectEvent)
@@ -28,7 +43,9 @@ class SelfLinkEventListener
         $object = $objectEvent->getObject();
         try {
             $class = ClassUtils::getClass($objectEvent->getObject());
-            $visitor->addData('_class', $class);
+            if($this->addClass) {
+                $visitor->addData('_class', $class);
+            }
             foreach ($this->entitiesRoutes as $entityClass => $routeName) {
                 switch (true) {
                     case $class == $entityClass:

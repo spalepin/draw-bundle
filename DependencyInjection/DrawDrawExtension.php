@@ -27,6 +27,9 @@ class DrawDrawExtension extends Extension
         if($config['use_api_exception_subscriber']) {
             $loader->load('api_exception_subscriber.yml');
         }
+
+        $container->getDefinition('draw.serializer.self_link')
+            ->addMethodCall('setAddClass', [$config['use_api_exception_subscriber']]);
     }
 
     public function getAlias()

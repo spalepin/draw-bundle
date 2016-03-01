@@ -20,6 +20,7 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $treeBuilder->root('draw_bundle')
             ->children()
+                ->booleanNode('serialization_add_class')->defaultFalse()->end()
                 ->booleanNode('use_api_exception_subscriber')->defaultTrue()->end()
             ->end();
 
