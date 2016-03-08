@@ -89,7 +89,8 @@ class ApiExceptionSubscriber implements EventSubscriberInterface
                 $errors[] = array(
                     'propertyPath' => $constraintViolation->getPropertyPath(),
                     'message' => $constraintViolation->getMessage(),
-                    'invalidValue' => $constraintViolation->getInvalidValue()
+                    'invalidValue' => $constraintViolation->getInvalidValue(),
+                    'code' => $constraintViolation->getCode()
                 );
             }
 
