@@ -13,6 +13,9 @@ services:
         alias: jms_serializer.doctrine_object_constructor
         public: false
 
+    jms_serializer.unserialize_object_constructor:
+        class: Draw\DrawBundle\Serializer\Construction\SimpleObjectConstructor
+
     draw.doctrine.validation_entity_subscriber:
         class: Draw\DrawBundle\Validator\ValidationEntitySubscriber
         arguments: [@service_container]
