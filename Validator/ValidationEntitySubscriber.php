@@ -38,7 +38,7 @@ class ValidationEntitySubscriber implements EventSubscriber
     {
         $entity = $args->getObject();
 
-        $violations = $this->container->get('validator')->validate($entity, array('persist'));
+        $violations = $this->container->get('validator')->validate($entity, null, array('persist'));
 
         if ($violations->count() > 0) {
             $exception = new ConstraintViolationListException("" . $violations);

@@ -86,13 +86,18 @@ class ApiExceptionSubscriber implements EventSubscriberInterface
             $errors = array();
             foreach ($exception->getViolationList() as $constraintViolation) {
                 /* @var $constraintViolation \Symfony\Component\Validator\ConstraintViolationInterface */
-                $errors[] = array(
+                $error = array(
                     'propertyPath' => $constraintViolation->getPropertyPath(),
                     'message' => $constraintViolation->getMessage(),
                     'invalidValue' => $constraintViolation->getInvalidValue(),
-                    'code' => $constraintViolation->getCode(),
-                    'payload' => $constraintViolation->getConstraint()->payload
+                    'code' => $constraintViolation->getCode()
                 );
+
+                if(!is_null($payload = $constraintViolation->getConstraint()->payload)) {
+                    $error['payload'] = $payload;
+                }
+
+                $errors[] = $error;
             }
 
             $data['errors'] = $errors;
