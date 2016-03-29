@@ -28,6 +28,10 @@ class DrawDrawExtension extends Extension
             $loader->load('api_exception_subscriber.yml');
         }
 
+        if($config['use_doctrine_repository_factory']) {
+            $loader->load('doctrine_repository_factory.yml');
+        }
+
         $container->getDefinition('draw.serializer.self_link')
             ->addMethodCall('setAddClass', [$config['serialization_add_class']]);
     }

@@ -22,6 +22,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->booleanNode('serialization_add_class')->defaultFalse()->end()
                 ->booleanNode('use_api_exception_subscriber')->defaultTrue()->end()
+                ->booleanNode('use_doctrine_repository_factory')->defaultTrue()->end()
             ->end();
 
         return $treeBuilder;
