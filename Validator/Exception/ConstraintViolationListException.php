@@ -15,6 +15,7 @@ class ConstraintViolationListException extends ValidatorException
     public function setViolationList(ConstraintViolationListInterface $violationList)
     {
         $this->violationList = $violationList;
+        $this->message = (string)$violationList;
     }
 
     public function getViolationList()
