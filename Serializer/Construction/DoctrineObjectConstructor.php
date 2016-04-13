@@ -47,14 +47,14 @@ class DoctrineObjectConstructor implements ObjectConstructorInterface
         }
 
         //If the object is not found we relay on the fallback constructor
-        if (is_null($object = $this->loadObject($metadata->name, $data))) {
+        if (is_null($object = $this->loadObject($metadata->name, $data, $context))) {
             return $this->fallbackConstructor->construct($visitor, $metadata, $data, $type, $context);
         }
 
         return $object;
     }
 
-    private function loadObject($class, $data)
+    private function loadObject($class, $data, DeserializationContext $context)
     {
         $objectManager = $this->managerRegistry->getManagerForClass($class);
         $classMetadataFactory = $objectManager->getMetadataFactory();
@@ -70,13 +70,15 @@ class DoctrineObjectConstructor implements ObjectConstructorInterface
         $classMetadata = $objectManager->getClassMetadata($class);
         $identifierList = array();
 
+
+
         foreach ($classMetadata->getIdentifierFieldNames() as $name) {
             if (!array_key_exists($name, $data)) {
                 return null;
             }
 
             if ($classMetadata->hasAssociation($name)) {
-                $data[$name] = $this->loadObject($classMetadata->getAssociationTargetClass($name), $data[$name]);
+                $data[$name] = $this->loadObject($classMetadata->getAssociationTargetClass($name), $data[$name], $context);
             }
 
             $identifierList[$name] = $data[$name];

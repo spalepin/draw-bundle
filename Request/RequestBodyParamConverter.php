@@ -31,8 +31,13 @@ class RequestBodyParamConverter extends \FOS\RestBundle\Request\RequestBodyParam
 
             $propertyAccessor = PropertyAccess::createPropertyAccessor();
 
+            $attributes = (object)$request->attributes->all();
             foreach ($options['propertiesMap'] as $target => $source) {
-                $propertyAccessor->setValue($content, $target, $request->attributes->get($source));
+                $propertyAccessor->setValue(
+                    $content,
+                    $target,
+                    $propertyAccessor->getValue($attributes, $source)
+                );
             }
 
             $property = new \ReflectionProperty(get_class($request), 'content');
@@ -66,6 +71,14 @@ class RequestBodyParamConverter extends \FOS\RestBundle\Request\RequestBodyParam
 
         $options['groups'] = $this->groupHierarchy->getReachableGroups($options['groups']);
 
-        return parent::configureDeserializationContext($context, $options);
+        $context = parent::configureDeserializationContext($context, $options);
+
+        if(isset($options['attributes'])) {
+            foreach($options['attributes'] as $attribute => $value) {
+                $context->setAttribute($attribute, $value);
+            }
+        }
+
+        return $context;
     }
 }
