@@ -21,6 +21,11 @@ class SelfLinkEventListener
      */
     private $addClass = true;
 
+    /**
+     * @var array
+     */
+    private $classRouteInfo = array();
+
     public function __construct(ContainerInterface $container, $entitiesRoutes = array())
     {
         $this->container = $container;
@@ -41,28 +46,62 @@ class SelfLinkEventListener
     {
         $visitor = $objectEvent->getVisitor();
         $object = $objectEvent->getObject();
+        $router = $this->container->get("router");
         try {
             $class = ClassUtils::getClass($objectEvent->getObject());
-            if($this->addClass) {
+            if ($this->addClass) {
                 $visitor->addData('_class', $class);
             }
-            foreach ($this->entitiesRoutes as $entityClass => $routeName) {
-                switch (true) {
-                    case $class == $entityClass:
-                    case is_subclass_of($class, $entityClass);
-                        $visitor->addData(
-                            '_href',
-                            $this->container->get("router")->generate(
-                                $routeName,
-                                array('id' => $this->container->get("property_accessor")->getValue($object, 'id')),
-                                UrlGeneratorInterface::ABSOLUTE_URL
-                            )
-                        );
-                        break;
+
+            $routeInfo = $this->getClassRouteInfo($class);
+            if (!is_null($routeInfo)) {
+                $parameters = [];
+                foreach ($routeInfo[1] as $parameter => $propertyPath) {
+                    $parameters[$parameter] = $this->container->get("property_accessor")
+                        ->getValue($object, $propertyPath);
                 }
+                $visitor->addData(
+                    '_href',
+                    $router->generate($routeInfo[0], $parameters, UrlGeneratorInterface::ABSOLUTE_URL)
+                );
             }
         } catch (\InvalidArgumentException $e) {
 
+        }
+    }
+
+    private function getClassRouteInfo($class)
+    {
+        if (array_key_exists($class, $this->classRouteInfo)) {
+            return $this->classRouteInfo[$class];
+        }
+
+        foreach ($this->entitiesRoutes as $entityClass => $routeName) {
+            if ($class != $entityClass && !is_subclass_of($class, $entityClass)) {
+                continue;
+            }
+
+            return $this->classRouteInfo[$class] = [$routeName, ['id' => 'id']];
+        }
+
+        foreach ($this->container->get("router")->getRouteCollection()->all() as $routeName => $route) {
+            $options = $route->getOptions();
+            if (!isset($options['draw']['href']['class'])) {
+                continue;
+            }
+
+            $entityClass = $options['draw']['href']['class'];
+            if ($class != $entityClass && !is_subclass_of($class, $entityClass)) {
+                continue;
+            }
+
+            if (isset($options['draw']['href']['parameterPaths'])) {
+                $parameterPaths = $options['draw']['href']['parameterPaths'];
+            } else {
+                $parameterPaths = ['id' => 'id'];
+            }
+
+            return $this->classRouteInfo[$class] = [$routeName, $parameterPaths];
         }
     }
 }
