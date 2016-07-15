@@ -292,6 +292,11 @@ class RequestHelper
         return $crawler;
     }
 
+    /**
+     * @param $name
+     * @param $value
+     * @return $this
+     */
     public function setServerParameter($name, $value)
     {
         $this->servers[$name] = $value;
