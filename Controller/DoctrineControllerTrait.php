@@ -23,6 +23,11 @@ trait DoctrineControllerTrait
         return $entity;
     }
 
+    public function flushAll($entity)
+    {
+        $this->getDoctrine()->getManagerForClass(get_class($entity))->flush();
+    }
+
     public function persist($entity)
     {
         $this->getDoctrine()->getManagerForClass(get_class($entity))->persist($entity);
