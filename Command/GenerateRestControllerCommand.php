@@ -21,9 +21,12 @@ class GenerateRestControllerCommand extends GenerateDoctrineCommand
     public function configure()
     {
         $this
+            ->setName('draw:generate:controller:rest')
             ->setDefinition(array(
                 new InputOption('controller', '', InputOption::VALUE_REQUIRED, 'The name of the controller to create'),
+                new InputOption('controllerSubNamespace', '', InputOption::VALUE_REQUIRED, 'The sub namespace of the controller to add.'),
                 new InputOption('entity', '', InputOption::VALUE_REQUIRED, 'The name of the entity to generate the controller for.'),
+                new InputOption('entityPrefix', '', InputOption::VALUE_REQUIRED, 'A prefix to for the entity'),
                 new InputOption('override', '', InputOption::VALUE_NONE, 'If we must override existing file.'),
             ))
             ->setDescription('Generates a crud rest controller')
@@ -53,7 +56,7 @@ You can check https://github.com/sensio/SensioGeneratorBundle/tree/master/Resour
 in order to know the file structure of the skeleton
 EOT
             )
-            ->setName('draw:generate:controller:rest')
+
         ;
     }
 
@@ -75,6 +78,8 @@ EOT
 
         $entity = Validators::validateEntityName($input->getOption('entity'));
         $controller = $input->getOption('controller');
+        $entityPrefix = $input->getOption('entityPrefix');
+        $controllerSubNamespace = $input->getOption('controllerSubNamespace');
         list($bundle, $entity) = $this->parseShortcutNotation($entity);
 
         $questionHelper->writeSection($output, 'Rest generation');
@@ -85,7 +90,7 @@ EOT
         $override = (bool)$input->getOption('override');
 
         $generator = $this->getGenerator($bundle);
-        $generator->generate($bundle, $controller, $entityClass, $override);
+        $generator->generate($bundle, $controller, $entityClass, $override, $entityPrefix, $controllerSubNamespace);
 
         $output->writeln('Generating the CRUD code: <info>OK</info>');
 
@@ -135,8 +140,30 @@ EOT
         $question = new Question($questionHelper->getQuestion('The Controller name', $controller), $controller);
 
         $controller = $questionHelper->ask($input, $output, $question);
-
         $input->setOption('controller', $controller);
+
+        if($input->hasOption('controllerSubNamespace')) {
+            $controllerSubNamespace = $input->getOption('controllerSubNamespace');
+        }
+        $question = new Question($questionHelper->getQuestion('Controller sub namespace', $controllerSubNamespace), $controllerSubNamespace);
+
+        $controllerSubNamespace = $questionHelper->ask($input, $output, $question);
+
+        $input->setOption('controllerSubNamespace', $controllerSubNamespace);
+
+        $entityPrefix = '';
+        if($input->hasOption('entityPrefix')) {
+            $entityPrefix = $input->getOption('entityPrefix');
+        }
+        $question = new Question($questionHelper->getQuestion('Entity prefix', $entityPrefix), $entityPrefix);
+
+        $entityPrefix = $questionHelper->ask($input, $output, $question);
+
+        $input->setOption('entityPrefix', $entityPrefix);
+
+        if($controllerSubNamespace) {
+            $controllerSubNamespace .= '\\';
+        }
 
         // summary
         $output->writeln(array(
@@ -145,7 +172,9 @@ EOT
             '',
             sprintf("You are going to generate a REST controller for \"<info>%s:%s</info>\"", $bundle, $entity),
             '',
-            sprintf("Controller name is \"<info>%s</info>\"", $controller),
+            sprintf("Controller name is \"<info>%s</info>\"", $controllerSubNamespace . $controller),
+
+            sprintf("Entity prefix \"<info>%s</info>\"", $entityPrefix),
             '',
         ));
     }

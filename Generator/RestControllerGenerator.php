@@ -21,10 +21,15 @@ class RestControllerGenerator extends Generator
         $this->filesystem = $filesystem;
     }
 
-    public function generate(BundleInterface $bundle, $controller, $entity, $override)
+    public function generate(BundleInterface $bundle, $controller, $entity, $override, $prefix, $controllerSubNamespace)
     {
+        if($controllerSubNamespace) {
+            $controllerSubFolder = '/' . str_replace('\\','/', $controllerSubNamespace);
+        } else {
+            $controllerSubFolder = '';
+        }
         $dir = $bundle->getPath();
-        $controllerFile = $dir.'/Controller/'.$controller.'Controller.php';
+        $controllerFile = $dir.'/Controller'.$controllerSubFolder.'/'.$controller.'Controller.php';
         if (!$override && file_exists($controllerFile)) {
            throw new \RuntimeException(sprintf('Controller "%s" already exists', $controller));
         }
@@ -40,17 +45,34 @@ class RestControllerGenerator extends Generator
             )
         );
 
+        if($prefix) {
+            $prefix = ucfirst($prefix);
+            $prefixUnderscored = strtolower(
+                preg_replace(
+                    ["/([A-Z]+)/", "/_([A-Z]+)([A-Z][a-z])/"],
+                    ["_$1", "_$1_$2"],
+                    lcfirst($prefix)
+                )
+            ) . '_';
+            $prefixDash = str_replace('_','-', $prefixUnderscored);
+        } else {
+            $prefixUnderscored = '';
+            $prefixDash = '';
+        }
+
         $parameters = array(
-            'namespace'       => $bundle->getNamespace(),
-            'bundle'          => $bundle->getName(),
-            'entityShortName' => $shortName,
-            'entityClass'     => $entity,
-            'entityUnderScore'=> $underscored,
-            'entityDash'      => str_replace('_','-', $underscored),
-            'controller'      => $controller,
+            'namespace'              => $bundle->getNamespace(),
+            'bundle'                 => $bundle->getName(),
+            'entityShortName'        => $shortName,
+            'entityClass'            => $entity,
+            'entityUnderScore'       => $prefixUnderscored . $underscored,
+            'entityDash'             => $prefixDash . str_replace('_','-', $underscored),
+            'controller'             => $controller,
+            'controllerSubNamespace' => $controllerSubNamespace,
+            'prefix'                 => $prefix
         );
 
         $this->renderFile('controller/rest/Controller.php.twig', $controllerFile, $parameters);
-        $this->renderFile('controller/rest/ControllerTest.php.twig', $dir.'/Tests/Controller/'.$controller.'ControllerTest.php', $parameters);
+        $this->renderFile('controller/rest/ControllerTest.php.twig', $dir.'/Tests/Controller'.$controllerSubFolder.'/'.$controller.'ControllerTest.php', $parameters);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace {{ namespace }}\Controller;
+namespace {{ namespace }}\Controller{{ controllerSubNamesapce }};
 
 {% block use_statements %}
 use {{ entityClass }} as Entity;
@@ -22,7 +22,7 @@ class {{ controller }}Controller extends Controller
     /**
      * Create a {{ entityShortName }}
      *
-     * @Swagger\Tag(name="{{ controller }}")
+     * @Swagger\Tag(name="{{ prefix }}{{ controller }}")
      *
      * @Rest\Post("/{{ entityDash }}s", name="{{ entityUnderScore }}_create")
      *
@@ -50,7 +50,7 @@ class {{ controller }}Controller extends Controller
     /**
      * Get a {{ entityShortName }}
      *
-     * @Swagger\Tag(name="{{ controller }}")
+     * @Swagger\Tag(name="{{ prefix }}{{ controller }}")
      *
      * @Rest\Get("/{{ entityDash }}s/{id}", name="{{ entityUnderScore }}_get")
      *
@@ -72,9 +72,9 @@ class {{ controller }}Controller extends Controller
     /**
      * Update a {{ entityShortName }}
      *
-     * @Swagger\Tag(name="{{ controller }}")
+     * @Swagger\Tag(name="{{ prefix }}{{ controller }}")
      *
-     * @Rest\Get("/{{ entityDash }}s/{id}", name="{{ entityUnderScore }}_update")
+     * @Rest\Put("/{{ entityDash }}s/{id}", name="{{ entityUnderScore }}_update")
      *
      * @Rest\View(serializerGroups={"{{ entityDash }}:read"})
      *
@@ -102,7 +102,7 @@ class {{ controller }}Controller extends Controller
     /**
      * List {{ entityShortName }}s
      *
-     * @Swagger\Tag(name="{{ controller }}")
+     * @Swagger\Tag(name="{{ prefix }}{{ controller }}")
      *
      * @Rest\Get("/{{ entityDash }}s", name="{{ entityUnderScore }}_list")
      *
@@ -125,7 +125,7 @@ class {{ controller }}Controller extends Controller
     /**
      * Delete a {{ entityShortName }}
      *
-     * @Swagger\Tag(name="{{ controller }}")
+     * @Swagger\Tag(name="{{ prefix }}{{ controller }}")
      *
      * @Rest\Get("/{{ entityDash }}s/{id}", name="{{ entityUnderScore }}_delete")
      *
