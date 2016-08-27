@@ -70,10 +70,8 @@ class DoctrineObjectConstructor implements ObjectConstructorInterface
         $classMetadata = $objectManager->getClassMetadata($class);
         $identifierList = array();
 
-
-
         foreach ($classMetadata->getIdentifierFieldNames() as $name) {
-            if (!array_key_exists($name, $data)) {
+            if (!isset($data[$name])) {
                 return null;
             }
 
