@@ -1,6 +1,6 @@
 <?php
 
-namespace {{ namespace }}\Controller{{ controllerSubNamesapce }};
+namespace {{ namespace }}\Controller{% if controllerSubNamespace %}\{{ controllerSubNamespace }}{% endif %};
 
 {% block use_statements %}
 use {{ entityClass }} as Entity;
