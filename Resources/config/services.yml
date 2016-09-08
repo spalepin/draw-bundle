@@ -1,11 +1,15 @@
 parameters:
     fos_rest.converter.request_body.class: Draw\DrawBundle\Request\RequestBodyParamConverter
     fos_rest.view_response_listener.class: Draw\DrawBundle\EventListener\ViewResponseListener
+    draw.error_handling.exception_message_formatter.class: Draw\DrawBundle\ErrorHandling\DefaultExceptionMessageFormatter
     draw.serializer.group_hierarchy: {}
     draw.serializer.groups_always_present: [all]
     draw.serializer.self_link.entities_routes: {}
 
 services:
+    draw.error_handling.exception_message_formatter:
+        class: %draw.error_handling.exception_message_formatter.class%
+
     draw.request_deserializer:
         alias: fos_rest.converter.request_body
 

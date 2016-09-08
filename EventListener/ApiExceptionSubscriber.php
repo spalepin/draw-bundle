@@ -3,14 +3,18 @@
 namespace Draw\DrawBundle\EventListener;
 
 use Draw\DrawBundle\Validator\Exception\ConstraintViolationListException;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-class ApiExceptionSubscriber implements EventSubscriberInterface
+class ApiExceptionSubscriber implements EventSubscriberInterface, ContainerAwareInterface
 {
+    use ContainerAwareTrait;
+
     private $debug;
 
     private $exceptionCodes;
@@ -79,7 +83,8 @@ class ApiExceptionSubscriber implements EventSubscriberInterface
 
         $data = array(
             "code" => $statusCode,
-            "message" => $exception->getMessage(),
+            "message" => $this->container->get('draw.error_handling.exception_message_formatter')
+                ->formatExceptionMessage($exception)
         );
 
         if($exception instanceof ConstraintViolationListException) {
