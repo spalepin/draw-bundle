@@ -79,6 +79,9 @@ class ApiExceptionSubscriber implements EventSubscriberInterface, ContainerAware
             return;
         }
 
+        $this->container->get("logger")
+            ->notice('Intercepted exception', $this->getExceptionDetail($exception, false));
+
         $statusCode = $this->getStatusCode($exception);
 
         $data = array(
@@ -134,7 +137,7 @@ class ApiExceptionSubscriber implements EventSubscriberInterface, ContainerAware
         return 'other';
     }
 
-    public function getExceptionDetail(\Exception $e)
+    public function getExceptionDetail(\Exception $e, $full = true)
     {
         $result = array(
             'class' => get_class($e),
@@ -144,13 +147,16 @@ class ApiExceptionSubscriber implements EventSubscriberInterface, ContainerAware
             'line' => $e->getLine()
         );
 
-        foreach(explode("\n",$e->getTraceAsString()) as $line) {
-            $result['stack'][] = $line;
+        if($full) {
+            foreach(explode("\n",$e->getTraceAsString()) as $line) {
+                $result['stack'][] = $line;
+            }
+
+            if($previous = $e->getPrevious()) {
+                $result['previous'] = $this->getExceptionDetail($previous);
+            }
         }
 
-        if($previous = $e->getPrevious()) {
-            $result['previous'] = $this->getExceptionDetail($previous);
-        }
 
         return $result;
     }
