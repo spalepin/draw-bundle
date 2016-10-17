@@ -2,8 +2,11 @@
 
 namespace Draw\DrawBundle\Doctrine;
 
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+
 trait DoctrineServiceContainerAwareTrait
 {
+    use ContainerAwareTrait;
     use DoctrineServiceTrait;
 
     /**
